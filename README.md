@@ -7,6 +7,8 @@ Original author is David Kißling (user mactree of http://www.kaffee-netz.de)
 
 Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträgermaschienen, die keinen eingebauten Zähler für die Espresso-Bezugszeit haben. Er zeigt die Sekunden ab Bezug an, ohne umständlich extra Stoppuhren bedienen zu müssen und ermöglicht dadurch einfach ein konsistentes, perfektes Ergebnis :)
 
+![Beispielbild](sample.jpg)
+
 # Konfigurationen
 
 - Display: OLED oder 7-Segment-LED
