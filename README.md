@@ -9,6 +9,15 @@ Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträg
 
 ![Beispielbild](sample.jpg)
 
+## Features
+
+- Anzeige der Bezugszeit (*shot timer*)
+- weitere optionale Features
+  - Anzeige der Brühgruppentemperatur
+  - Anzeige der Kesseltemperatur
+  - Anzeige der Pre-Infusion-Dauer
+  - geplant: Anzeige der Einschaltdauer
+
 # Konfigurationen
 
 - Display: OLED oder 7-Segment-LED
