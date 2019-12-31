@@ -144,7 +144,7 @@ void loop() {
   }
   
   if (isSleep && isSleeptimerRun) {
-    if ((tick > showLastShot) || ((timerValue) < 8)) {
+    if (tick > showLastShot || timerValue < 8) {
       MsTimer2::stop();
       display.clear();
 
