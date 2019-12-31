@@ -39,6 +39,7 @@ const int START_PIN = 5;
 const int TICK_INTERVAL = 10; 
 const int TICK_TOLERANCE = 8;
 int tick = 0;
+void Tick() { ++tick; }
 int getSecondsFromTick() { return tick / (1000 / TICK_INTERVAL); }
 
 // define how long the last shot-time will be shown (depends on TICK_INTERVAL)
@@ -62,7 +63,7 @@ void setup() {
   pinMode(START_PIN, INPUT);
   digitalWrite(START_PIN, HIGH);
 
-  MsTimer2::set(TICK_INTERVAL, [&](){ ++tick; });
+  MsTimer2::set(TICK_INTERVAL, Tick);
   
   Serial.begin(9600);
   Serial.println("setup done");
