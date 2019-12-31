@@ -160,6 +160,7 @@ void loop() {
       requestT = false;
     }
 
+	//TODO: check: requestT will always be false here so the first part of the if expression is always true
 	if (!requestT && tcount >= 800000) {
        requestT = true;
        tcount = 0;
