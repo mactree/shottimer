@@ -21,7 +21,7 @@ v2.000.000 - rewrite for 1637 based 7Segment
 #include <Arduino.h>
 
 // setup for the tsic sensor on pin 2
-TSIC Sensor1(2, 3); 
+TSIC sensor(2, 3); 
 
 // Module connection pins (Digital Pins)
 const int CLK_PIN = 19;  //A4
@@ -51,7 +51,7 @@ bool isHold = true;
 float timerValue = 0.0f;
 
 // tempsensor
-bool checkTemp = 0; ///
+bool isSensorConnected = false;
 float tempInCelsius = 0;
 uint16_t temperature = 0;
 bool requestT;
@@ -71,16 +71,15 @@ void setup() {
   display.setSegments(bar1);
   delay(500);
 
-  if (Sensor1.getTemperature(&temperature)) {
-    tempInCelsius = Sensor1.calc_Celsius(&temperature);  
+  if (sensor.getTemperature(&temperature) && sensor.calc_Celsius(&temperature) > 0) {
+    isSensorConnected = true;
   };
   
   display.setSegments(bar2);
   delay(500);
 
-  if (tempInCelsius > 0 ) {
-    Serial.println("tempInCelsius > 1");
-    checkTemp = 1;
+  if (isSensorConnected) {
+	Serial.println("temperature sensor is active (value > 0 degree)");
     display.setSegments(bar3);
     delay(500);
   }
@@ -159,7 +158,7 @@ void loop() {
   }
   
   // get and display temperature runs only if tsic is present on startup
-  if (checkTemp && !isTimerRun && !isStartPressed && !isHold) {
+  if (isSensorConnected && !isTimerRun && !isStartPressed && !isHold) {
     if (requestT) {
       requestT = 0;
     }
@@ -168,8 +167,8 @@ void loop() {
        requestT = 1;
        tcount = 0;
       
-      if(Sensor1.getTemperature(&temperature)) {
-         tempInCelsius = Sensor1.calc_Celsius(&temperature);
+      if(sensor.getTemperature(&temperature)) {
+         tempInCelsius = sensor.calc_Celsius(&temperature);
       }
 	  
       // set tempInCelsius to -1 when sensor looses conection
