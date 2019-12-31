@@ -24,16 +24,16 @@ v2.000.000 - rewrite for 1637 based 7Segment
 TSIC Sensor1(2, 3); 
 
 // Module connection pins (Digital Pins)
-#define CLK 19  //A4
-#define DIO 18  //A5
-TM1637Display display(CLK, DIO);
+const int CLK_PIN = 19;  //A4
+const int DIO_PIN = 18;  //A5
+TM1637Display display(CLK_PIN, DIO_PIN);
 
 const uint8_t bar1[] = { SEG_A, SEG_A, SEG_A, SEG_A };
 const uint8_t bar2[] = { SEG_G, SEG_G, SEG_G, SEG_G };
 const uint8_t bar3[] = { SEG_D, SEG_D, SEG_D, SEG_D };
 
 // define signal input
-const int btnSTARTpin = 5;
+const int START_PIN = 5;
 
 // define how long the last shot-time will be shown
 int showLastShot = 1000; // 500 => 5s; 1000 => 10s
@@ -57,8 +57,8 @@ uint16_t temperature = 0;
 bool requestT;
 
 void setup() {
-  pinMode(btnSTARTpin, INPUT);
-  digitalWrite(btnSTARTpin, HIGH);
+  pinMode(START_PIN, INPUT);
+  digitalWrite(START_PIN, HIGH);
 
   MsTimer2::set(TICK_INTERVAL, [&](){ ++tick; });
   
@@ -94,7 +94,7 @@ void setup() {
 void loop() {
 
   // check for signal
-  bool isStartPressed = digitalRead(btnSTARTpin) == LOW;
+  bool isStartPressed = digitalRead(START_PIN) == LOW;
 
   // active signal on P1 start timer
   if (isStartPressed) {
