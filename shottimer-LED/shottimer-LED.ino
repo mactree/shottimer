@@ -40,7 +40,8 @@ int showLastShot = 1000; // 500 => 5s; 1000 => 10s
 
 // increment tick variable every XX ms
 const int TICK_INTERVAL = 10; 
-int tick = 0;  
+int tick = 0;
+int getSecondsFromTick() { return tick / (1000 / TICK_INTERVAL); }
 
 long tcount = 1000000;
 bool isTimerRun = false;
@@ -48,7 +49,7 @@ bool isSleeptimerRun = false;
 bool isSleep = true;
 bool isHold = true;
 
-float timerValue = 0.0f;
+int timerValue = 0;
 
 // tempsensor
 bool isSensorConnected = false;
@@ -115,18 +116,14 @@ void loop() {
 
   // timer is running
   if (isTimerRun && isStartPressed) {
-    float countF = tick;
-    int TIME = countF / 100;
-    // display Time
     display.setBrightness(10);
-    display.showNumberDec(TIME, true, 3, 0);
+    display.showNumberDec(getSecondsFromTick(), true, 3, 0);
   }
   
   // no active signal
   if (isTimerRun && !isStartPressed) {
     MsTimer2::stop();
-    float countF = tick;
-    timerValue = countF / 100;
+    timerValue = getSecondsFromTick();
     isTimerRun = false;
     isSleep = true;
     tick = 0;
