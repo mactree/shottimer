@@ -13,8 +13,8 @@ Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträg
 
 - Anzeige der Bezugszeit (*shot timer*)
 - weitere optionale Features
-  - Anzeige der Brühgruppentemperatur
-  - Anzeige der Kesseltemperatur
+  - Anzeige der Temperatur an einem Meßpunkt (zBsp: Brühgruppe, Kessel)
+  - Anzeige der Temperatur eines weiteren Meßpunktes
   - Anzeige der Pre-Infusion-Dauer
   - geplant: Anzeige der Einschaltdauer
 
@@ -29,5 +29,31 @@ Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträg
 Der *Espresso-Shot-Timer* wurde erfolgreich mit folgenden Geräte verwendet:
 
 - Bezzera BZ 10
+- Bezzera BZ 99
+- Bezzera Mitica Top
+- La Cimbali Junior
+- La Marzocco Linea
+- La Marzocco Linea Mini
+- La Spaziale S1 Vivaldi II
+- SAB Pratika
+
+# Einsatzgebiete
+
+Der Timer mit dem OLED Display ist ausschliesslich für den Betrieb ausserhalb der Maschine gedacht.
+Der Timer mit der SiebenSegment LED Anzeige kann auch im innern der Maschine verbaut werden.
+
+# Vorrausetzungen
+
+Wenn du diesen Timer verbauen willst musst du dir die folgenden Sachen zutrauen:
+- Maschine öffnen
+- Netzschalter erkennen 
+- Pumpe erkennen 
+- 3Wege Magnetventil (Gruppenventil) erkennen
+
+# mögliche Einschränkungen
+
+Wenn der Signalabgriff an der Pumpe erfolgt, springt der Timer auch bei der Kesselbefüllung an.
+Je nach Kabelführung kann es durch Elektromagnetische Einstreuung zu abstürzen des Timers kommen.
+
 
 Weitere siehe hier: https://www.kaffee-netz.de/threads/vorstellung-projekt-espresso-shot-timer-mit-temperaturanzeige.85390
