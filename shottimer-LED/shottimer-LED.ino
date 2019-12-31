@@ -35,13 +35,14 @@ const uint8_t bar3[] = { SEG_D, SEG_D, SEG_D, SEG_D };
 // define signal input
 const int START_PIN = 5;
 
-// define how long the last shot-time will be shown
-int showLastShot = 1000; // 500 => 5s; 1000 => 10s
-
 // increment tick variable every XX ms
 const int TICK_INTERVAL = 10; 
+const int TICK_TOLERANCE = 8;
 int tick = 0;
 int getSecondsFromTick() { return tick / (1000 / TICK_INTERVAL); }
+
+// define how long the last shot-time will be shown (depends on TICK_INTERVAL)
+const int SHOW_DURATION = 1000; // 500 => 5s; 1000 => 10s
 
 long tcount = 1000000;
 bool isTimerRun = false;
@@ -117,7 +118,7 @@ void loop() {
   // timer is running
   if (isTimerRun && isStartPressed) {
     display.setBrightness(10);
-    display.showNumberDec(getSecondsFromTick(), true, 3, 0);
+    display.showNumberDec(getSecondsFromTick(), true /*leading zero*/, 3, 0);
   }
   
   // no active signal
@@ -135,12 +136,12 @@ void loop() {
       MsTimer2::start();
       isSleeptimerRun = true;
       display.setBrightness(10);
-      display.showNumberDec(timerValue, true, 3, 0);      
+      display.showNumberDec(timerValue, true /*leading zero*/, 3, 0);      
     }
   }
   
   if (isSleep && isSleeptimerRun) {
-    if (tick > showLastShot || timerValue < 8) {
+    if (tick > SHOW_DURATION || timerValue < TICK_TOLERANCE) {
       MsTimer2::stop();
       display.clear();
 
@@ -181,7 +182,7 @@ void loop() {
         display.showNumberDecEx(TEMPt ,(0x80 >> 1) , false, 3, 0);
       }
       else {
-        display.showNumberDec(tempInCelsius, false, 3, 0);       
+        display.showNumberDec(tempInCelsius, false /*leading zero*/, 3, 0);       
       }
     }
     tcount++;
