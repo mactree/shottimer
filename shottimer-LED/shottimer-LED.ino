@@ -41,11 +41,10 @@ int showLastShot = 1000; // 500 => 5s; 1000 => 10s
 // define global variables
 int count = 0;
 long tcount = 1000000;
-bool timerRUN = 0;
-bool sleeptimerRUN = 0;
-bool sleep = 1;
-bool hold = 1;
-bool lcdclear = 0;
+bool isTimerRun = false;
+bool isSleeptimerRun = false;
+bool isSleep = true;
+bool isHold = true;
 
 float TIME;
 
@@ -91,11 +90,11 @@ void setup() {
 void loop() {
 
   // check for signal
-  int klick1 = !digitalRead(btnSTARTpin);
+  bool isStartPressed = digitalRead(btnSTARTpin) == LOW;
 
   // active signal on P1 start timer
-  if (klick1) {
-    if (!timerRUN) {
+  if (isStartPressed) {
+    if (!isTimerRun) {
       MsTimer2::set(10, Tick);
       MsTimer2::start();
 
@@ -103,17 +102,17 @@ void loop() {
       display.clear();
 
       // set variable
-      timerRUN = 1;
+      isTimerRun = true;
       count = 0;
       TIME = 0;
-      sleep = 0;
-      sleeptimerRUN = 0;
-      hold = 1;
+      isSleep = false;
+      isSleeptimerRun = false;
+      isHold = true;
     }
   }
 
   // timer is running
-  if (timerRUN && klick1) {
+  if (isTimerRun && isStartPressed) {
     float countF = count;
     int TIME = countF / 100;
     // display Time
@@ -122,43 +121,43 @@ void loop() {
   }
   
   // no active signal
-  if (timerRUN && !klick1) {
+  if (isTimerRun && !isStartPressed) {
     MsTimer2::stop();
     float countF = count;
     TIME = countF / 100;
-    timerRUN = 0;
-    sleep = 1;
+    isTimerRun = false;
+    isSleep = true;
     count = 0;
     //      tcount = 0;
   }
   
-  if (sleep) {
-    if (!sleeptimerRUN) {
+  if (isSleep) {
+    if (!isSleeptimerRun) {
       MsTimer2::set(10, Tick);
       MsTimer2::start();
-      sleeptimerRUN = 1;
+      isSleeptimerRun = true;
       display.setBrightness(10);
       display.showNumberDec(TIME, true, 3, 0);      
     }
   }
   
-  if (sleep && sleeptimerRUN) {
+  if (isSleep && isSleeptimerRun) {
     if ((count > showLastShot) || ((TIME) < 8)) {
       MsTimer2::stop();
       display.clear();
 
       //reset variables
-      sleeptimerRUN = 0;
+      isSleeptimerRun = false;
       count = 0;
-      sleep = 0;
-      hold = 0;
+      isSleep = false;
+      isHold = false;
       requestT = 1;
       tcount = 1000000;
     }
   }
   
   // get and display temperature runs only if tsic is present on startup
-  if (checkTemp && !timerRUN && !klick1 && !hold) {
+  if (checkTemp && !isTimerRun && !isStartPressed && !isHold) {
     if ( requestT) {
       requestT = 0;
     }
