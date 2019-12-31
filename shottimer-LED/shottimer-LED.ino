@@ -54,7 +54,7 @@ float timerValue = 0.0f;
 bool isSensorConnected = false;
 float tempInCelsius = 0;
 uint16_t temperature = 0;
-bool requestT;
+bool requestT = false;
 
 void setup() {
   pinMode(START_PIN, INPUT);
@@ -152,7 +152,7 @@ void loop() {
       tick = 0;
       isSleep = false;
       isHold = false;
-      requestT = 1;
+      requestT = true;
       tcount = 1000000;
     }
   }
@@ -160,11 +160,11 @@ void loop() {
   // get and display temperature runs only if tsic is present on startup
   if (isSensorConnected && !isTimerRun && !isStartPressed && !isHold) {
     if (requestT) {
-      requestT = 0;
+      requestT = false;
     }
 
 	if (!requestT && tcount >= 800000) {
-       requestT = 1;
+       requestT = true;
        tcount = 0;
       
       if(sensor.getTemperature(&temperature)) {
