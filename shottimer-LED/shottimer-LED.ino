@@ -38,8 +38,10 @@ const int btnSTARTpin = 5;
 // define how long the last shot-time will be shown
 int showLastShot = 1000; // 500 => 5s; 1000 => 10s
 
-// define global variables
-int count = 0;
+// increment tick variable every XX ms
+const int TICK_INTERVAL = 10; 
+int tick = 0;  
+
 long tcount = 1000000;
 bool isTimerRun = false;
 bool isSleeptimerRun = false;
@@ -58,6 +60,8 @@ void setup() {
   pinMode(btnSTARTpin, INPUT);
   digitalWrite(btnSTARTpin, HIGH);
 
+  MsTimer2::set(TICK_INTERVAL, [&](){ ++tick; });
+  
   Serial.begin(9600);
   Serial.println("setup done");
 
@@ -95,7 +99,6 @@ void loop() {
   // active signal on P1 start timer
   if (isStartPressed) {
     if (!isTimerRun) {
-      MsTimer2::set(10, Tick);
       MsTimer2::start();
 
       // reset lcd
@@ -103,7 +106,7 @@ void loop() {
 
       // set variable
       isTimerRun = true;
-      count = 0;
+      tick = 0;
       TIME = 0;
       isSleep = false;
       isSleeptimerRun = false;
@@ -113,7 +116,7 @@ void loop() {
 
   // timer is running
   if (isTimerRun && isStartPressed) {
-    float countF = count;
+    float countF = tick;
     int TIME = countF / 100;
     // display Time
     display.setBrightness(10);
@@ -123,17 +126,16 @@ void loop() {
   // no active signal
   if (isTimerRun && !isStartPressed) {
     MsTimer2::stop();
-    float countF = count;
+    float countF = tick;
     TIME = countF / 100;
     isTimerRun = false;
     isSleep = true;
-    count = 0;
-    //      tcount = 0;
+    tick = 0;
+    //tcount = 0;
   }
   
   if (isSleep) {
     if (!isSleeptimerRun) {
-      MsTimer2::set(10, Tick);
       MsTimer2::start();
       isSleeptimerRun = true;
       display.setBrightness(10);
@@ -142,13 +144,13 @@ void loop() {
   }
   
   if (isSleep && isSleeptimerRun) {
-    if ((count > showLastShot) || ((TIME) < 8)) {
+    if ((tick > showLastShot) || ((TIME) < 8)) {
       MsTimer2::stop();
       display.clear();
 
       //reset variables
       isSleeptimerRun = false;
-      count = 0;
+      tick = 0;
       isSleep = false;
       isHold = false;
       requestT = 1;
@@ -158,7 +160,7 @@ void loop() {
   
   // get and display temperature runs only if tsic is present on startup
   if (checkTemp && !isTimerRun && !isStartPressed && !isHold) {
-    if ( requestT) {
+    if (requestT) {
       requestT = 0;
     }
 
@@ -187,8 +189,4 @@ void loop() {
     }
     tcount++;
   }
-}
-
-void Tick() {
-  count++;
 }
