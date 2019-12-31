@@ -48,7 +48,7 @@ bool isSleeptimerRun = false;
 bool isSleep = true;
 bool isHold = true;
 
-float TIME;
+float timerValue = 0.0f;
 
 // tempsensor
 bool checkTemp = 0; ///
@@ -107,7 +107,7 @@ void loop() {
       // set variable
       isTimerRun = true;
       tick = 0;
-      TIME = 0;
+      timerValue = 0;
       isSleep = false;
       isSleeptimerRun = false;
       isHold = true;
@@ -127,7 +127,7 @@ void loop() {
   if (isTimerRun && !isStartPressed) {
     MsTimer2::stop();
     float countF = tick;
-    TIME = countF / 100;
+    timerValue = countF / 100;
     isTimerRun = false;
     isSleep = true;
     tick = 0;
@@ -139,12 +139,12 @@ void loop() {
       MsTimer2::start();
       isSleeptimerRun = true;
       display.setBrightness(10);
-      display.showNumberDec(TIME, true, 3, 0);      
+      display.showNumberDec(timerValue, true, 3, 0);      
     }
   }
   
   if (isSleep && isSleeptimerRun) {
-    if ((tick > showLastShot) || ((TIME) < 8)) {
+    if ((tick > showLastShot) || ((timerValue) < 8)) {
       MsTimer2::stop();
       display.clear();
 
