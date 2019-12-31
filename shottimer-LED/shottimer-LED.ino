@@ -13,15 +13,12 @@
   
 v2.000.000 - rewrite for 1637 based 7Segment  
 
+*/
 
-  */
-
-// librarys
-#include <MsTimer2.h>
-#include <Arduino.h>
 #include <TM1637Display.h>
 #include "TSIC.h"
-
+#include <MsTimer2.h>
+#include <Arduino.h>
 
 // setup for the tsic sensor on pin 2
 TSIC Sensor1(2, 3); 
@@ -31,20 +28,12 @@ TSIC Sensor1(2, 3);
 #define DIO 18  //A5
 TM1637Display display(CLK, DIO);
 
-
-const uint8_t bar1[] = {
-  SEG_A,SEG_A,SEG_A,SEG_A
-};
-const uint8_t bar2[] = {
-  SEG_G,SEG_G,SEG_G,SEG_G
-};
-const uint8_t bar3[] = {
-  SEG_D,SEG_D,SEG_D,SEG_D
-};
+const uint8_t bar1[] = { SEG_A, SEG_A, SEG_A, SEG_A };
+const uint8_t bar2[] = { SEG_G, SEG_G, SEG_G, SEG_G };
+const uint8_t bar3[] = { SEG_D, SEG_D, SEG_D, SEG_D };
 
 // define signal input
 const int btnSTARTpin = 5;
-
 
 // define how long the last shot-time will be shown
 int showLastShot = 1000; // 500 => 5s; 1000 => 10s
@@ -56,21 +45,15 @@ bool timerRUN = 0;
 bool sleeptimerRUN = 0;
 bool sleep = 1;
 bool hold = 1;
-
-
-
 bool lcdclear = 0;
 
 float TIME;
-
 
 // tempsensor
 bool checkTemp = 0; ///
 float TEMP = 0;
 uint16_t temperature = 0;
 bool requestT;
-
-
 
 void setup() {
   pinMode(btnSTARTpin, INPUT);
@@ -79,13 +62,13 @@ void setup() {
   Serial.begin(9600);
   Serial.println("setup done");
 
-  //check if temperature sensor tsic is connected 
+  // check if temperature sensor tsic is connected 
   Serial.println("check for sensor");
   display.setBrightness(10);
   display.setSegments(bar1);
   delay(500);
 
-  if(Sensor1.getTemperature(&temperature)){
+  if (Sensor1.getTemperature(&temperature)) {
     TEMP = Sensor1.calc_Celsius(&temperature);  
   };
   
@@ -97,21 +80,17 @@ void setup() {
     checkTemp = 1;
     display.setSegments(bar3);
     delay(500);
-    }
-  else{
+  }
+  else {
     Serial.println("set check For Sensor => FALSE");
     display.setSegments(bar1);
     delay(500);
-
-    }
   }
-
-
+}
 
 void loop() {
 
-
-  //check for signal
+  // check for signal
   int klick1 = !digitalRead(btnSTARTpin);
 
   // active signal on P1 start timer
@@ -121,7 +100,7 @@ void loop() {
       MsTimer2::start();
 
       // reset lcd
-     display.clear();
+      display.clear();
 
       // set variable
       timerRUN = 1;
@@ -140,8 +119,8 @@ void loop() {
     // display Time
     display.setBrightness(10);
     display.showNumberDec(TIME, true, 3, 0);
-
   }
+  
   // no active signal
   if (timerRUN && !klick1) {
     MsTimer2::stop();
@@ -152,6 +131,7 @@ void loop() {
     count = 0;
     //      tcount = 0;
   }
+  
   if (sleep) {
     if (!sleeptimerRUN) {
       MsTimer2::set(10, zeitLaeuft);
@@ -161,6 +141,7 @@ void loop() {
       display.showNumberDec(TIME, true, 3, 0);      
     }
   }
+  
   if (sleep && sleeptimerRUN) {
     if ((count > showLastShot) || ((TIME) < 8)) {
       MsTimer2::stop();
@@ -173,22 +154,23 @@ void loop() {
       hold = 0;
       requestT = 1;
       tcount = 1000000;
-      }
+    }
   }
+  
   // get and display temperature runs only if tsic is present on startup
   if (checkTemp && !timerRUN && !klick1 && !hold) {
     if ( requestT) {
       requestT = 0;
     }
-      if (!requestT && tcount >= 800000) {
+
+	if (!requestT && tcount >= 800000) {
        requestT = 1;
        tcount = 0;
       
-      if(Sensor1.getTemperature(&temperature)){
+      if(Sensor1.getTemperature(&temperature)) {
          TEMP = Sensor1.calc_Celsius(&temperature);
-        };
-      //TEMP = Sensor1.calc_Celsius(&temperature);  
-
+      }
+	  
       // set TEMP to -1 when sensor looses conection
       Serial.println(TEMP);
       if (TEMP == -127) {
@@ -196,22 +178,17 @@ void loop() {
       }
       display.setBrightness(10);
       
-      if(TEMP < 100){
+      if (TEMP < 100) {
         int TEMPt = TEMP*10;
         display.showNumberDecEx(TEMPt ,(0x80 >> 1) , false, 3, 0);
       }
-      else{
+      else {
         display.showNumberDec(TEMP, false, 3, 0);       
-         
       }
-  
-
     }
     tcount++;
   }
- 
 }
-
 
 void zeitLaeuft() {
   count++;
