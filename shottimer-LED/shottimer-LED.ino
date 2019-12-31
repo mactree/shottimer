@@ -52,7 +52,7 @@ float timerValue = 0.0f;
 
 // tempsensor
 bool checkTemp = 0; ///
-float TEMP = 0;
+float tempInCelsius = 0;
 uint16_t temperature = 0;
 bool requestT;
 
@@ -72,14 +72,14 @@ void setup() {
   delay(500);
 
   if (Sensor1.getTemperature(&temperature)) {
-    TEMP = Sensor1.calc_Celsius(&temperature);  
+    tempInCelsius = Sensor1.calc_Celsius(&temperature);  
   };
   
   display.setSegments(bar2);
   delay(500);
 
-  if (TEMP > 0 ) {
-    Serial.println("TEMP > 1");
+  if (tempInCelsius > 0 ) {
+    Serial.println("tempInCelsius > 1");
     checkTemp = 1;
     display.setSegments(bar3);
     delay(500);
@@ -169,22 +169,22 @@ void loop() {
        tcount = 0;
       
       if(Sensor1.getTemperature(&temperature)) {
-         TEMP = Sensor1.calc_Celsius(&temperature);
+         tempInCelsius = Sensor1.calc_Celsius(&temperature);
       }
 	  
-      // set TEMP to -1 when sensor looses conection
-      Serial.println(TEMP);
-      if (TEMP == -127) {
-        TEMP = -1;
+      // set tempInCelsius to -1 when sensor looses conection
+      Serial.println(tempInCelsius);
+      if (tempInCelsius == -127) {
+        tempInCelsius = -1;
       }
       display.setBrightness(10);
       
-      if (TEMP < 100) {
-        int TEMPt = TEMP*10;
+      if (tempInCelsius < 100) {
+        int TEMPt = tempInCelsius*10;
         display.showNumberDecEx(TEMPt ,(0x80 >> 1) , false, 3, 0);
       }
       else {
-        display.showNumberDec(TEMP, false, 3, 0);       
+        display.showNumberDec(tempInCelsius, false, 3, 0);       
       }
     }
     tcount++;
