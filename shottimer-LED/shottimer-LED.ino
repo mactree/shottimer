@@ -173,8 +173,8 @@ void loop() {
 	  
       // set tempInCelsius to -1 when sensor looses conection
       Serial.println(tempInCelsius);
-      if (tempInCelsius == -127) {
-        tempInCelsius = -1;
+      if (tempInCelsius <= -127.0f) {
+        tempInCelsius = -1.0f;
       }
       display.setBrightness(10);
       
