@@ -7,7 +7,7 @@ Original author is David Kißling (user mactree of http://www.kaffee-netz.de)
 
 Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträgermaschienen, die keinen eingebauten Zähler für die Espresso-Bezugszeit haben. Er zeigt die Sekunden ab Bezug an, ohne umständlich extra Stoppuhren bedienen zu müssen und ermöglicht dadurch einfach ein konsistentes, perfektes Ergebnis :)
 
-![Beispielbild](sample.jpg)
+![Beispielbild](images/sample.jpg)
 
 ## Features
 
@@ -23,6 +23,30 @@ Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträg
 - Display: OLED oder 7-Segment-LED
 - Temparatur-Sensoren für Brühgruppe und/oder Kessel
 - Anzeige für PreInfusion
+
+### Basic (7-Segment-LED - ohne Temparatursensor)
+
+- Zeigt an, wie lange das Gerät angeschaltet ist (= Aufheizzeit) - *mäßige Helligkeit*
+- Zeigt die Bezugszeit an (Shot-Timer) und hält diese für 10 Sekunden nach - *hohe Helligkeit*
+- danach wieder Wechsel zur Einschaltdauer
+![Einschaltdauer](images/sample_basic_onTime.jpg)
+![Shot Timer](images/sample_basic_shot.jpg)
+
+### 7-Segment-LED mit einem Temparatursensor
+
+- Zeigt die Temparatur des Sensors an
+- Zeigt die Bezugszeit an (Shot-Timer) und hält diese für 10 Sekunden nach; danach wieder Wechsel zur Einschaltdauer
+
+### OLED mit einem Temparatursensor
+
+- Zeigt die Temparatur des Sensors an
+- Zeigt die Bezugszeit an (Shot-Timer) und hält diese für 10 Sekunden nach; danach wieder Wechsel zur Einschaltdauer
+
+
+### OLED mit zwei Temparatursensoren
+
+- Zeigt die Temparatur der Sensoren an (Kessel und Brühgruppe)
+- Zeigt die Bezugszeit an (Shot-Timer) und hält diese für 10 Sekunden nach; danach wieder Wechsel zur Einschaltdauer
 
 ## Kompatibilitätsliste
 
