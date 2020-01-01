@@ -40,7 +40,7 @@ int getSecondsFromTick() {
 // define how long the last shot-time will be shown (depends on TICK_INTERVAL)
 const int SHOW_DURATION = 1000; // 500 => 5s; 1000 => 10s
 
-bool isTimerRun = false;
+bool isTimerStarted = false;
 bool isSleeptimerRun = false;
 bool isSleep = true;
 bool isHold = true;
@@ -67,63 +67,61 @@ void setup() {
 }
 
 void loop() {
-  display.DrawDuration(now() - startTime);
-  
   // check for signal
   bool isStartPressed = digitalRead(START_PIN) == LOW;
 
   // active signal on P1 start timer
   if (isStartPressed) {
-    if (!isTimerRun) {
+    if (!isTimerStarted) {
       MsTimer2::start();
 
-      // reset lcd
-      display.Clear();
-
       // set variable
-      isTimerRun = true;
+      isTimerStarted = true;
       tick = 0;
       timerValue = 0;
       isSleep = false;
       isSleeptimerRun = false;
       isHold = true;
+      display.SetBrightness(Display::Brightness::Bright);
     }
-  }
-
-  // timer is running
-  if (isTimerRun && isStartPressed) {
-    //display.setBrightness(10);
-    //display.DrawNum(getSecondsFromTick());
-  }
-
-  // no active signal
-  if (isTimerRun && !isStartPressed) {
-    MsTimer2::stop();
-    timerValue = getSecondsFromTick();
-    isTimerRun = false;
-    isSleep = true;
-    tick = 0;
-  }
-
-  if (isSleep) {
-    if (!isSleeptimerRun) {
-      MsTimer2::start();
-      isSleeptimerRun = true;
-      // display.setBrightness(10);
-      //display.DrawNum(timerValue);
-    }
-  }
-
-  if (isSleep && isSleeptimerRun) {
-    if (tick > SHOW_DURATION || timerValue < TICK_TOLERANCE) {
+    
+    display.DrawShotTime(getSecondsFromTick());
+  } 
+  else {
+    // no active signal
+    if (isTimerStarted) {
       MsTimer2::stop();
-      display.Clear();
-
-      //reset variables
-      isSleeptimerRun = false;
+      timerValue = getSecondsFromTick();
+      isTimerStarted = false;
+      isSleep = true;
       tick = 0;
-      isSleep = false;
-      isHold = false;
+    }
+  
+    if (isSleep) {
+      if (!isSleeptimerRun) {
+        MsTimer2::start();
+        isSleeptimerRun = true;
+        display.DrawShotTime(timerValue);
+      }
+  
+      if (tick > SHOW_DURATION || timerValue < TICK_TOLERANCE) {
+        MsTimer2::stop();
+  
+        //reset variables
+        isSleeptimerRun = false;
+        tick = 0;
+        isSleep = false;
+        isHold = false;
+        display.SetBrightness(Display::Brightness::Dark);
+        display.Clear();
+      }    
+    }
+    else {
+      auto secs = now() - startTime;
+      display.DrawOnTime(secs);
+      Serial.println(secs);
     }
   }
+
+  //delay(100);
 }
