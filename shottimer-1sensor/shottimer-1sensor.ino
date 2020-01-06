@@ -11,10 +11,10 @@
 
   changelog
 
-v1.005.003 - change tsic libraray
-   004.014 - delay check Temp 
-   004.005 - delete Bounce 
-   004.004 - change pin mapping 
+  v1.005.003 - change tsic libraray
+   004.014 - delay check Temp
+   004.005 - delete Bounce
+   004.004 - change pin mapping
    003.010 - change to Tsic temperature sensor
    002.030 - added "°" to the library font which makes the temperature display a lot easier
    002.026 - slow down the temperature request set resolution again to 12
@@ -171,8 +171,8 @@ bool StartScreen = 1;
 
 
 void setup() {
-    //Serial.begin(9600);
-  
+  //Serial.begin(9600);
+
   pinMode(btnSTARTpin, INPUT);
   digitalWrite(btnSTARTpin, HIGH);
   pinMode(btnPUMPpin, INPUT);
@@ -182,28 +182,28 @@ void setup() {
   delay(40);
   lcd.begin();
 
-    lcd.setFontSize(FONT_SIZE_MEDIUM);
-    lcd.setCursor(5, 0);
-    lcd.print(version[0]);
-    lcd.setCursor(5, 3);
-    lcd.print(version[1]);
-    lcd.setFontSize(FONT_SIZE_SMALL);
-    lcd.setCursor(60, 7);
-    lcd.print(version[2]);
-    
-      
-    delay(3000);
+  lcd.setFontSize(FONT_SIZE_MEDIUM);
+  lcd.setCursor(5, 0);
+  lcd.print(version[0]);
+  lcd.setCursor(5, 3);
+  lcd.print(version[1]);
+  lcd.setFontSize(FONT_SIZE_SMALL);
+  lcd.setCursor(60, 7);
+  lcd.print(version[2]);
+
+
+  delay(3000);
 
   //check if temperature sensor tsic is connected runs only once
- 
-    Sensor1.getTemperature(&temperature);
-              Serial.println(temperature);
-    TEMP = Sensor1.calc_Celsius(&temperature);  
-          Serial.println(TEMP);
-    if (TEMP > 0) {
-      checkTemp = checkTemp + 1;
-    }
-     for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+
+  Sensor1.getTemperature(&temperature);
+  Serial.println(temperature);
+  TEMP = Sensor1.calc_Celsius(&temperature);
+  Serial.println(TEMP);
+  if (TEMP > 0) {
+    checkTemp = checkTemp + 1;
+  }
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings[thisReading] = 0;
   }
 
@@ -320,7 +320,7 @@ void loop() {
     if (!requestT && tcount >= 20000) {
       requestT = 1;
       tcount = 0;
-      if(checkTemp ==1){
+      if (checkTemp == 1) {
         getTemp();
         lcd.setFontSize(FONT_SIZE_MEDIUM);
         lcd.setCursor(5, 3);
@@ -328,7 +328,7 @@ void loop() {
         lcd.print(TEMP, 1);
         lcd.print("^  ");
       }
-    }                   
+    }
 
     tcount++;
   }
