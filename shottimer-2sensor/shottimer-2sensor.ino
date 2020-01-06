@@ -11,10 +11,10 @@
 
   changelog
 
-v1.005.003 - change tsic libraray
-   004.014 - delay check Temp 
-   004.005 - delete Bounce 
-   004.004 - change pin mapping 
+  v1.005.003 - change tsic libraray
+   004.014 - delay check Temp
+   004.005 - delete Bounce
+   004.004 - change pin mapping
    003.010 - change to Tsic temperature sensor
    002.030 - added "°" to the library font which makes the temperature display a lot easier
    002.026 - slow down the temperature request set resolution again to 12
@@ -152,9 +152,9 @@ const int numReadings = 10;
 int readings[numReadings];      // the readings from the analog input
 int readings2[numReadings];      // the readings from the analog input
 int readIndex = 0;              // the index of the current reading
-int readIndex2 = 0;    
+int readIndex2 = 0;
 int total = 0;                  // the running total
-int total2 = 0; 
+int total2 = 0;
 int error = 0;
 int error2 = 0;
 
@@ -184,8 +184,8 @@ bool StartScreen = 1;
 
 
 void setup() {
-    //Serial.begin(9600);
-  
+  //Serial.begin(9600);
+
   pinMode(btnSTARTpin, INPUT);
   digitalWrite(btnSTARTpin, HIGH);
   pinMode(btnPUMPpin, INPUT);
@@ -195,39 +195,39 @@ void setup() {
   delay(40);
   lcd.begin();
 
-    lcd.setFontSize(FONT_SIZE_MEDIUM);
-    lcd.setCursor(5, 0);
-    lcd.print(version[0]);
-    lcd.setCursor(5, 3);
-    lcd.print(version[1]);
-    lcd.setFontSize(FONT_SIZE_SMALL);
-    lcd.setCursor(60, 7);
-    lcd.print(version[2]);
-    
-      
-    delay(3000);
+  lcd.setFontSize(FONT_SIZE_MEDIUM);
+  lcd.setCursor(5, 0);
+  lcd.print(version[0]);
+  lcd.setCursor(5, 3);
+  lcd.print(version[1]);
+  lcd.setFontSize(FONT_SIZE_SMALL);
+  lcd.setCursor(60, 7);
+  lcd.print(version[2]);
+
+
+  delay(3000);
 
   //check if temperature sensor tsic is connected runs only once
- 
-    Sensor1.getTemperature(&temperature);
-              Serial.println(temperature);
-    TEMP = Sensor1.calc_Celsius(&temperature);  
-          Serial.println(TEMP);
-    Sensor2.getTemperature(&temperature2);
-          Serial.println(temperature2);
-    TEMP2 = Sensor2.calc_Celsius(&temperature2);  
-          Serial.println(TEMP2);          
-    if (TEMP > 0) {
-      checkTemp = checkTemp + 1;
-    }
-    if (TEMP2 > 0){
-      checkTemp = checkTemp + 2;
-    }
-     for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+
+  Sensor1.getTemperature(&temperature);
+  Serial.println(temperature);
+  TEMP = Sensor1.calc_Celsius(&temperature);
+  Serial.println(TEMP);
+  Sensor2.getTemperature(&temperature2);
+  Serial.println(temperature2);
+  TEMP2 = Sensor2.calc_Celsius(&temperature2);
+  Serial.println(TEMP2);
+  if (TEMP > 0) {
+    checkTemp = checkTemp + 1;
+  }
+  if (TEMP2 > 0) {
+    checkTemp = checkTemp + 2;
+  }
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings[thisReading] = 0;
   }
 
-     for (int thisReading = 0; thisReading < numReadings; thisReading++) {
+  for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings2[thisReading] = 0;
   }
 
@@ -344,15 +344,15 @@ void loop() {
     if (!requestT && tcount >= 20000) {
       requestT = 1;
       tcount = 0;
- 
-      
-            
 
 
 
-      
 
-      if(checkTemp ==3){
+
+
+
+
+      if (checkTemp == 3) {
         getTemp();
         getTemp2();
         lcd.setFontSize(FONT_SIZE_MEDIUM);
@@ -362,19 +362,19 @@ void loop() {
         // uses modified font "^" is replaced by "°"
         lcd.print("^  ");
         lcd.setCursor(5, 5);
-        lcd.print("Kessel: ");  
+        lcd.print("Kessel: ");
         lcd.print(TEMP2, 1);
-        lcd.print("^  ");  
+        lcd.print("^  ");
       }
-      else if( checkTemp == 2){
+      else if ( checkTemp == 2) {
         getTemp2();
         lcd.setFontSize(FONT_SIZE_MEDIUM);
         lcd.setCursor(5, 3);
-        lcd.print("Kessel: ");  
+        lcd.print("Kessel: ");
         lcd.print(TEMP2, 1);
-        lcd.print("^  ");   
+        lcd.print("^  ");
       }
-      else{
+      else {
         getTemp();
         lcd.setFontSize(FONT_SIZE_MEDIUM);
         lcd.setCursor(5, 3);
@@ -385,26 +385,26 @@ void loop() {
 
 
 
-      
+
       Serial.print(" TEMP1: ");
       Serial.print(TEMP);
       Serial.print(" raw1: ");
       Serial.print(temperature);
       Serial.print("-");
-//      Serial.print(tmp);
+      //      Serial.print(tmp);
       Serial.print("-");
-      Serial.print(previousTMP);      
+      Serial.print(previousTMP);
       Serial.print("  TEMP2: ");
-      Serial.print(TEMP2);   
+      Serial.print(TEMP2);
       Serial.print(" raw2: ");
       Serial.print(temperature2);
       Serial.print("-");
-    Serial.print(previousTMP2); 
+      Serial.print(previousTMP2);
       Serial.print("-");
       Serial.print(error2);
       Serial.print("-");
       Serial.println(checkTemp);
-    }                   
+    }
 
     tcount++;
   }
