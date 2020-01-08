@@ -56,7 +56,7 @@ struct Display {
 	
 	void DrawGroupTemperature(float value) {
 		_lcd.setFontSize(FONT_SIZE_MEDIUM);
-        _lcd.setCursor(5, 3);
+        _lcd.setCursor(5, 1);
         _lcd.print("Gruppe: ");
         _lcd.print(value, 1);
         _lcd.print("^  ");
