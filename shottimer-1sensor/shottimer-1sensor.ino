@@ -176,74 +176,79 @@ void loop() {
       turnLightOn = true;
       showStartScreen = false;
     }
+    
+	// timer is running
+    if (isTimerStarted) {
+ 	  float countF = tick;
+ 	  int TIME = countF / 100;
+ 	  
+	  // get first time
+ 	  if (!getFirstTime) {
+ 	    getFirstTime = true;
+ 	  }
+ 	  // get second time
+ 	  if (klick2 && !getSecondTime) {
+ 	    firstTIME = TIME;
+ 	    getSecondTime = true;
+ 	    tick = 0;
+ 	  }
+ 	  // get third time
+ 	  if (getFirstTime && getSecondTime && !getThirdTime && !klick2) {
+ 	    secondTIME = TIME;
+ 	    TIME = 0;
+ 	    tick = 0;
+ 	    getThirdTime = true;
+ 	  }
+ 	
+ 	  if (!getThirdTime) {
+ 	    lcd.DrawTimer(TIME);
+ 	  }
+ 	  if (firstTIME != 0 && getSecondTime) {
+ 	    lcd.DrawPreInfusion(5, 0, firstTIME);
+ 	  }
+ 	  if (TIME > 0 && getThirdTime ) {
+ 	    lcd.DrawPreInfusion(70, 0, TIME);
+ 	  }
+    }
   }
-
-  // timer is running
-  if (isTimerStarted && klick1) {
-    float countF = tick;
-    int TIME = countF / 100;
-    // get first time
-    if (!getFirstTime) {
+  else {
+    // no active signal
+    if (isTimerStarted) {
+      MsTimer2::stop();
+      float countF = tick;
+      TIME = countF / 100;
+      isTimerStarted = false;
+      isSleep = true;
+      tick = 0;
+      //      tcount = 0;
       getFirstTime = true;
-    }
-    // get second time
-    if (klick1 && klick2 && !getSecondTime) {
-      firstTIME = TIME;
-      getSecondTime = true;
-      tick = 0;
-    }
-    // get third time
-    if (getFirstTime && getSecondTime && !getThirdTime && !klick2) {
-      secondTIME = TIME;
-      TIME = 0;
-      tick = 0;
-      getThirdTime = true;
-    }
-    // seven segment
-    if (!getThirdTime) {
-      lcd.DrawTimer(TIME);
-    }
-    if (firstTIME != 0 && getSecondTime) {
-      lcd.DrawPreInfusion(5, 0, firstTIME);
-    }
-    if (TIME > 0 && getThirdTime ) {
-      lcd.DrawPreInfusion(70, 0, TIME);
+      getSecondTime = false;
+      getThirdTime = false;
     }
   }
-  // no active signal
-  if (isTimerStarted && !klick1) {
-    MsTimer2::stop();
-    float countF = tick;
-    TIME = countF / 100;
-    isTimerStarted = false;
-    isSleep = true;
-    tick = 0;
-    //      tcount = 0;
-    getFirstTime = true;
-    getSecondTime = false;
-    getThirdTime = false;
-  }
+  
   if (isSleep) {
     if (!isSleeptimerRun) {
       MsTimer2::set(10, Tick);
       MsTimer2::start();
       isSleeptimerRun = true;
     }
+	
+	if (tick > showLastShot || TIME + firstTIME + secondTIME < 8) {
+	  MsTimer2::stop();
+	  lcd.Clear();
+	  isSleeptimerRun = false;
+	  tick = 0;
+	  isSleep = false;
+	  isHold = false;
+	  turnLightOff = true;
+	  getFirstTime = false;
+	  getSecondTime = false;
+	  getThirdTime = false;
+	}
   }
-  if (isSleep && isSleeptimerRun) {
-    if ((tick > showLastShot) || ((TIME + firstTIME + secondTIME) < 8)) {
-      MsTimer2::stop();
-      lcd.Clear();
-      isSleeptimerRun = false;
-      tick = 0;
-      isSleep = false;
-      isHold = false;
-      turnLightOff = true;
-      getFirstTime = false;
-      getSecondTime = false;
-      getThirdTime = false;
-    }
   }
+  
   // get and display temperature runs only if tsic is present on startup
   if (checkTemp && !isTimerStarted && !klick1 && !isHold) {
     if (tcount >= 20000) {
@@ -256,6 +261,7 @@ void loop() {
 
     tcount++;
   }
+
   if (turnLightOn && !isLightOn) {
     // turn BaristaLight on
     isLightOn = true;
@@ -266,6 +272,7 @@ void loop() {
     }
     turnOffDelay = 0;
   }
+
   if (isLightOn) {
     if ( dimm < brightness) {
       unsigned long current = millis();
@@ -276,6 +283,7 @@ void loop() {
     }
     analogWrite(baristaLightPWM, dimm);
   }
+
   if (turnLightOff && !isLightOff && dimm == brightness) {
     // turn BaristaLight off
     turnLightOn = false;
@@ -283,6 +291,7 @@ void loop() {
     isLightOff = true;
     turnOffDelay = millis();
   }
+
   if (isLightOff) {
     unsigned long current = millis();
 
