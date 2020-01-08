@@ -82,17 +82,17 @@ bool isSleeptimerRun = false;
 bool isSleep = true;
 bool isHold = true;
 const char* version[] = {"Espresso", "Shot Timer", "v1.005.045"};
-long previous;
-long onTIME;
+long previous = 0;
+long onTIME = 0;
 
 
 bool getSecondTime = false;
 bool getFirstTime = false;
 bool getThirdTime = false;
 
-float TIME;
-int firstTIME;
-int secondTIME;
+float TIME = 0;
+int firstTIME = 0;
+int secondTIME = 0;
 
 // sensors
 int checkTemp = 0;
