@@ -160,6 +160,8 @@ void loop() {
   int klick1 = !digitalRead(btnSTARTpin);
   int klick2 = !digitalRead(btnPUMPpin);
 
+  lcd.DrawGroupTemperature(TEMP);
+  
   // active signal on P1 start timer
   if (klick1) {
     if (!isTimerStarted) {

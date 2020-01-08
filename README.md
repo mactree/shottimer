@@ -42,6 +42,7 @@ Der *Espresso-Shot-Timer* ist eine Nachrüst-Erweiterung für Espresso-Siebträg
 - Zeigt die Temparatur des Sensors an
 - Zeigt die Bezugszeit an (Shot-Timer) und hält diese für 10 Sekunden nach; danach wieder Wechsel zur Einschaltdauer
 
+![Einschaltdauer](images/sample_1sensor_onTime.jpg)
 
 ### OLED mit zwei Temparatursensoren
 
