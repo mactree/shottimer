@@ -109,8 +109,6 @@ int readIndex = 0;              // the index of the current reading
 int total = 0;                  // the running total
 int error = 0;
 
-bool isRequestT = false;
-
 // light
 bool turnLightOn = false;
 bool isLightOn = false;
@@ -244,16 +242,11 @@ void loop() {
       getFirstTime = false;
       getSecondTime = false;
       getThirdTime = false;
-      isRequestT = true;
     }
   }
   // get and display temperature runs only if tsic is present on startup
   if (checkTemp && !isTimerStarted && !klick1 && !isHold) {
-    if (isRequestT) {
-      isRequestT = false;
-    }
-    if (!isRequestT && tcount >= 20000) {
-      isRequestT = true;
+    if (tcount >= 20000) {
       tcount = 0;
       if (checkTemp == 1) {
         getTemp();
