@@ -41,7 +41,7 @@
 
 */
 
-// librarys
+// libraries
 #include <MsTimer2.h>
 #include <Arduino.h>
 #include <Wire.h>
@@ -50,8 +50,6 @@
 
 // comment in for use with relais
 //#include <Bounce.h>
-
-
 
 // 7-segemnt graphic
 const PROGMEM uint8_t zero[256] = {
@@ -117,29 +115,25 @@ int showLastShot = 1000; // 500 => 5s; 1000 => 10s
 // define global variables
 int count = 0;
 int tcount = 0;
-bool timerRUN = 0;
-bool sleeptimerRUN = 0;
-bool sleep = 1;
-bool hold = 1;
+bool isTimerStarted = false;
+bool isSleeptimerRun = false;
+bool isSleep = true;
+bool isHold = true;
 char* version[] = {"Espresso", "Shot Timer", "v1.005.045"};
 long previous;
 long onTIME;
 
 
-bool getSecondTime = 0;
-bool getFirstTime = 0;
-bool getThirdTime = 0;
-
-bool lcdclear = 0;
+bool getSecondTime = false;
+bool getFirstTime = false;
+bool getThirdTime = false;
 
 float TIME;
 int firstTIME;
 int secondTIME;
 
-
 // sensors
 int checkTemp = 0;
-bool checkTemp2 = 0;
 
 // sensor 1
 float TEMP = 0;
@@ -153,21 +147,19 @@ int readIndex = 0;              // the index of the current reading
 int total = 0;                  // the running total
 int error = 0;
 
-bool requestT;
-bool prepareTemp = true;
-
+bool isRequestT = false;
 
 // light
-bool turnLightOn = 0;
-bool LightIsOn = 0;
-bool turnLightOff = 0;
-bool LightIsOff = 0;
+bool turnLightOn = false;
+bool isLightOn = false;
+bool turnLightOff = false;
+bool isLightOff = false;
 int dimm = 0;
 int brightness = 200; // 255 => max 127 => 50%
-unsigned long turnOffDelay;
+unsigned long turnOffDelay = 0;
 
 // display
-bool StartScreen = 1;
+bool showStartScreen = true;
 
 
 void setup() {
@@ -218,37 +210,37 @@ void loop() {
 
   // active signal on P1 start timer
   if (klick1) {
-    if (!timerRUN) {
+    if (!isTimerStarted) {
       MsTimer2::set(10, zeitLaeuft);
       MsTimer2::start();
       // reset lcd
       lcd.clear();
       // set variable
-      timerRUN = 1;
+      isTimerStarted = true;
       count = 0;
       TIME = 0;
       firstTIME = 0;
       secondTIME = 0;
-      sleep = 0;
-      sleeptimerRUN = 0;
-      hold = 1;
-      turnLightOn = 1;
-      StartScreen = 0;
+      isSleep = false;
+      isSleeptimerRun = false;
+      isHold = true;
+      turnLightOn = true;
+      showStartScreen = false;
     }
   }
 
   // timer is running
-  if (timerRUN && klick1) {
+  if (isTimerStarted && klick1) {
     float countF = count;
     int TIME = countF / 100;
     // get first time
     if (!getFirstTime) {
-      getFirstTime = 1;
+      getFirstTime = true;
     }
     // get second time
     if (klick1 && klick2 && !getSecondTime) {
       firstTIME = TIME;
-      getSecondTime = 1;
+      getSecondTime = true;
       count = 0;
     }
     // get third time
@@ -256,7 +248,7 @@ void loop() {
       secondTIME = TIME;
       TIME = 0;
       count = 0;
-      getThirdTime = 1;
+      getThirdTime = true;
     }
     // seven segment
     if (!getThirdTime) {
@@ -278,47 +270,47 @@ void loop() {
     }
   }
   // no active signal
-  if (timerRUN && !klick1) {
+  if (isTimerStarted && !klick1) {
     MsTimer2::stop();
     float countF = count;
     TIME = countF / 100;
-    timerRUN = 0;
-    sleep = 1;
+    isTimerStarted = false;
+    isSleep = true;
     count = 0;
     //      tcount = 0;
-    getFirstTime = 0;
-    getSecondTime = 0;
-    getThirdTime = 0;
+    getFirstTime = true;
+    getSecondTime = false;
+    getThirdTime = false;
   }
-  if (sleep) {
-    if (!sleeptimerRUN) {
+  if (isSleep) {
+    if (!isSleeptimerRun) {
       MsTimer2::set(10, zeitLaeuft);
       MsTimer2::start();
-      sleeptimerRUN = 1;
+      isSleeptimerRun = true;
     }
   }
-  if (sleep && sleeptimerRUN) {
+  if (isSleep && isSleeptimerRun) {
     if ((count > showLastShot) || ((TIME + firstTIME + secondTIME) < 8)) {
       MsTimer2::stop();
       lcd.clear();
-      sleeptimerRUN = 0;
+      isSleeptimerRun = false;
       count = 0;
-      sleep = 0;
-      hold = 0;
-      turnLightOff = 1;
-      getFirstTime = 0;
-      getSecondTime = 0;
-      getThirdTime = 0;
-      requestT = 1;
+      isSleep = false;
+      isHold = false;
+      turnLightOff = true;
+      getFirstTime = false;
+      getSecondTime = false;
+      getThirdTime = false;
+      isRequestT = true;
     }
   }
   // get and display temperature runs only if tsic is present on startup
-  if (checkTemp && !timerRUN && !klick1 && !hold) {
-    if ( requestT) {
-      requestT = 0;
+  if (checkTemp && !isTimerStarted && !klick1 && !isHold) {
+    if (isRequestT) {
+      isRequestT = false;
     }
-    if (!requestT && tcount >= 20000) {
-      requestT = 1;
+    if (!isRequestT && tcount >= 20000) {
+      isRequestT = true;
       tcount = 0;
       if (checkTemp == 1) {
         getTemp();
@@ -332,17 +324,17 @@ void loop() {
 
     tcount++;
   }
-  if (turnLightOn && !LightIsOn) {
+  if (turnLightOn && !isLightOn) {
     // turn BaristaLight on
-    LightIsOn = 1;
-    LightIsOff = 0;
-    turnLightOff = 0;
+    isLightOn = true;
+    isLightOff = false;
+    turnLightOff = false;
     if (dimm < 100) {
       dimm = 100;
     }
     turnOffDelay = 0;
   }
-  if (LightIsOn) {
+  if (isLightOn) {
     if ( dimm < brightness) {
       unsigned long current = millis();
       if (current - previous > 10) {
@@ -352,14 +344,14 @@ void loop() {
     }
     analogWrite(baristaLightPWM, dimm);
   }
-  if (turnLightOff && !LightIsOff && dimm == brightness) {
+  if (turnLightOff && !isLightOff && dimm == brightness) {
     // turn BaristaLight off
-    turnLightOn = 0;
-    LightIsOn = 0;
-    LightIsOff = 1;
+    turnLightOn = false;
+    isLightOn = false;
+    isLightOff = true;
     turnOffDelay = millis();
   }
-  if (LightIsOff) {
+  if (isLightOff) {
     unsigned long current = millis();
 
     if (current - turnOffDelay > 90000) {
@@ -371,7 +363,7 @@ void loop() {
         }
       }
       if (dimm < 10) {
-        hold = 0;
+        isHold = false;
       }
       analogWrite(baristaLightPWM, dimm);
     }
