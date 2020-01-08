@@ -71,7 +71,11 @@ int baristaLightPWM = 6;
 int showLastShot = 1000; // 500 => 5s; 1000 => 10s
 
 // define global variables
-int count = 0;
+int tick = 0;
+void Tick() {
+  tick++;
+}
+
 int tcount = 0;
 bool isTimerStarted = false;
 bool isSleeptimerRun = false;
@@ -119,7 +123,6 @@ unsigned long turnOffDelay = 0;
 // display
 bool showStartScreen = true;
 
-
 void setup() {
   //Serial.begin(9600);
 
@@ -158,14 +161,14 @@ void loop() {
   // active signal on P1 start timer
   if (klick1) {
     if (!isTimerStarted) {
-      MsTimer2::set(10, zeitLaeuft);
+      MsTimer2::set(10, Tick);
       MsTimer2::start();
 
       lcd.Clear();
 
       // set variable
       isTimerStarted = true;
-      count = 0;
+      tick = 0;
       TIME = 0;
       firstTIME = 0;
       secondTIME = 0;
@@ -179,7 +182,7 @@ void loop() {
 
   // timer is running
   if (isTimerStarted && klick1) {
-    float countF = count;
+    float countF = tick;
     int TIME = countF / 100;
     // get first time
     if (!getFirstTime) {
@@ -189,13 +192,13 @@ void loop() {
     if (klick1 && klick2 && !getSecondTime) {
       firstTIME = TIME;
       getSecondTime = true;
-      count = 0;
+      tick = 0;
     }
     // get third time
     if (getFirstTime && getSecondTime && !getThirdTime && !klick2) {
       secondTIME = TIME;
       TIME = 0;
-      count = 0;
+      tick = 0;
       getThirdTime = true;
     }
     // seven segment
@@ -212,11 +215,11 @@ void loop() {
   // no active signal
   if (isTimerStarted && !klick1) {
     MsTimer2::stop();
-    float countF = count;
+    float countF = tick;
     TIME = countF / 100;
     isTimerStarted = false;
     isSleep = true;
-    count = 0;
+    tick = 0;
     //      tcount = 0;
     getFirstTime = true;
     getSecondTime = false;
@@ -224,17 +227,17 @@ void loop() {
   }
   if (isSleep) {
     if (!isSleeptimerRun) {
-      MsTimer2::set(10, zeitLaeuft);
+      MsTimer2::set(10, Tick);
       MsTimer2::start();
       isSleeptimerRun = true;
     }
   }
   if (isSleep && isSleeptimerRun) {
-    if ((count > showLastShot) || ((TIME + firstTIME + secondTIME) < 8)) {
+    if ((tick > showLastShot) || ((TIME + firstTIME + secondTIME) < 8)) {
       MsTimer2::stop();
       lcd.Clear();
       isSleeptimerRun = false;
-      count = 0;
+      tick = 0;
       isSleep = false;
       isHold = false;
       turnLightOff = true;
@@ -304,8 +307,4 @@ void loop() {
       analogWrite(baristaLightPWM, dimm);
     }
   }
-}
-
-void zeitLaeuft() {
-  count++;
 }
