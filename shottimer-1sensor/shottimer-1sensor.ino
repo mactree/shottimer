@@ -288,13 +288,13 @@ void loop() {
       }
     }
     analogWrite(baristaLightPWM, dimm);
-  }
 
-  if (turnLightOff && isLightOn && dimm == brightness) {
-    // turn BaristaLight off
-    turnLightOn = false;
-    isLightOn = false;
-    turnOffDelay = millis();
+    if (turnLightOff && dimm == brightness) {
+      // turn BaristaLight off
+      turnLightOn = false;
+      isLightOn = false;
+      turnOffDelay = millis();
+    }
   }
 
   if (!isLightOn) {
