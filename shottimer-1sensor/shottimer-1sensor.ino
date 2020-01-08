@@ -116,7 +116,6 @@ int error = 0;
 bool turnLightOn = false;
 bool isLightOn = false;
 bool turnLightOff = false;
-bool isLightOff = false;
 int dimm = 0;
 int brightness = 200; // 255 => max 127 => 50%
 unsigned long turnOffDelay = 0;
@@ -273,7 +272,6 @@ void loop() {
   if (turnLightOn && !isLightOn) {
     // turn BaristaLight on
     isLightOn = true;
-    isLightOff = false;
     turnLightOff = false;
     if (dimm < 100) {
       dimm = 100;
@@ -292,15 +290,14 @@ void loop() {
     analogWrite(baristaLightPWM, dimm);
   }
 
-  if (turnLightOff && !isLightOff && dimm == brightness) {
+  if (turnLightOff && isLightOn && dimm == brightness) {
     // turn BaristaLight off
     turnLightOn = false;
     isLightOn = false;
-    isLightOff = true;
     turnOffDelay = millis();
   }
 
-  if (isLightOff) {
+  if (!isLightOn) {
     unsigned long current = millis();
 
     if (current - turnOffDelay > 90000) {
