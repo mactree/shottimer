@@ -38,7 +38,6 @@ const PROGMEM uint8_t digits[][256] = {
 
 
 struct Display {
-// 7-segemnt graphic
 
 	void Setup(const char* const * version) {
 		_lcd.begin();
@@ -78,6 +77,26 @@ struct Display {
 		drawDigit(value % 10);
 		_lcd.setCursor(30, 1);
 		drawDigit((value / 10) % 10);
+	}
+	
+	void DrawOnTime(unsigned int secs) {
+		_lcd.setFontSize(FONT_SIZE_MEDIUM);
+        _lcd.setCursor(5, 5);
+		_lcd.print("An: ");
+		auto mins = secs / 60;
+		auto hours = mins / 60;
+		
+		if (hours > 0) {
+			mins = mins % 60;
+			_lcd.print(hours, 1);
+			_lcd.print(":");
+		}
+		auto s = secs % 60;
+		if (mins < 10) _lcd.print("0");
+		_lcd.print(mins, 1);
+		_lcd.print(":");
+		if (s < 10) _lcd.print("0");
+		_lcd.println(s, 1);
 	}
 
 private:

@@ -1,8 +1,8 @@
 /*
-  simple shot timer with 7-Seg style graphic output, temprature display and
+  simple shot timer with OLED graphic output, temprature display and
   signaloutput for a relais for baristlights during shot (version 06/06/2016)
   to use with an OLED diplay via I2C.
-  by David Kißling (user mactree of http://www.kaffee-netz.de )
+  by David Kißling (user mactree of http://www.kaffee-netz.de)
   BIG THANK TO:
   magicbugsbunny - for code snippets
   blu - for optimizing the code
@@ -11,7 +11,8 @@
 
   changelog
 
-  v1.005.003 - change tsic libraray
+  v1.006.000 - refactored code and added display of on-time
+   005.003 - change tsic libraray
    004.014 - delay check Temp
    004.005 - delete Bounce
    004.004 - change pin mapping
@@ -85,6 +86,8 @@ const char* version[] = {"Espresso", "Shot Timer", "v1.005.045"};
 long previous = 0;
 long onTIME = 0;
 
+unsigned int startTime = 0;
+unsigned int now() { return millis() / 1000 ; }
 
 bool getSecondTime = false;
 bool getFirstTime = false;
@@ -148,10 +151,12 @@ void setup() {
   for (int thisReading = 0; thisReading < numReadings; thisReading++) {
     readings[thisReading] = 0;
   }
+  
+  startTime = now();  
 }
 
 void loop() {
-
+ 
   //check for signal
   int klick1 = !digitalRead(btnSTARTpin);
   int klick2 = !digitalRead(btnPUMPpin);
@@ -247,6 +252,9 @@ void loop() {
 	  getThirdTime = false;
 	}
   }
+
+  if (!isTimerStarted && !isSleep) {
+	lcd.DrawOnTime(now() - startTime);
   }
   
   // get and display temperature runs only if tsic is present on startup
@@ -274,7 +282,7 @@ void loop() {
   }
 
   if (isLightOn) {
-    if ( dimm < brightness) {
+    if (dimm < brightness) {
       unsigned long current = millis();
       if (current - previous > 10) {
         previous = current;
