@@ -21,7 +21,7 @@
 #include <Arduino.h>
 
 // setup for the tsic sensor on pin 2
-TSIC sensor(2, 3);
+TSIC Sensor1(2, 3); // Signalpin, VCCpin,
 
 // Module connection pins (Digital Pins)
 const int CLK_PIN = 19;  //A4
@@ -59,9 +59,19 @@ int timerValue = 0;
 
 // tempsensor
 bool isSensorConnected = false;
-float tempInCelsius = 0;
+float TEMP = 0;
 uint16_t temperature = 0;
+uint16_t previousTMP = 0;
 bool requestT = false;
+
+const int numReadings = 10;
+
+int readings[numReadings];      // the readings from the analog input
+int readIndex = 0;              // the index of the current reading
+int total = 0;                  // the running total
+int error = 0;
+
+
 
 void setup() {
   pinMode(START_PIN, INPUT);
@@ -78,7 +88,7 @@ void setup() {
   display.setSegments(bar1);
   delay(500);
 
-  if (sensor.getTemperature(&temperature) && sensor.calc_Celsius(&temperature) > 0) {
+  if (Sensor1.getTemperature(&temperature) && Sensor1.calc_Celsius(&temperature) > 0) {
     isSensorConnected = true;
   };
 
@@ -167,27 +177,17 @@ void loop() {
     }
 
 	//TODO: check: requestT will always be false here so the first part of the if expression is always true
-	if (!requestT && tcount >= 800000) {
+	if (!requestT && tcount >= 20000) {
        requestT = true;
       tcount = 0;
-
-      if (sensor.getTemperature(&temperature)) {
-        tempInCelsius = sensor.calc_Celsius(&temperature);
-      }
-
-      // set tempInCelsius to -1 when sensor looses conection
-      Serial.println(tempInCelsius);
-      if (tempInCelsius <= -127.0f) {
-        tempInCelsius = -1.0f;
-      }
+      getTemp();
       display.setBrightness(10);
-
-      if (tempInCelsius < 100) {
-        int TEMPt = tempInCelsius * 10;
+      if (TEMP < 100) {
+        int TEMPt = TEMP * 10;
         display.showNumberDecEx(TEMPt , (0x80 >> 1) , false, 3, 0);
       }
       else {
-        display.showNumberDec(tempInCelsius, false /*leading zero*/, 3, 0);
+        display.showNumberDec(TEMP, false /*leading zero*/, 3, 0);
       }
     }
     tcount++;
