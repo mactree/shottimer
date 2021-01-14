@@ -19,9 +19,24 @@
 #include "TSIC.h"
 #include <MsTimer2.h>
 #include <Arduino.h>
+#include <EEPROM.h>
+
+// Settings
+#define EEPROM_VALUE_VERSION   8
+#define SETTINGS               0
+#define SET1                   1  // leading Zero on shotcounter
+#define SET2                   2  // Temp offset
+#define SET3                   3  // brigtness for temp
+#define SET4                   4  // brightness while counting
+#define SET5                   5  // time how long last shot 
+#define SET6                   6  // E61 Mode
+
+volatile byte setting = SET1;
+int settingSet[] = {0, 0, 0, 0, 0, 0, 0};
+
 
 // setup for the tsic sensor on pin 2
-TSIC sensor(2, 3);
+TSIC Sensor1(2, 3); // Signalpin, VCCpin,
 
 // Module connection pins (Digital Pins)
 const int CLK_PIN = 19;  //A4
@@ -47,9 +62,11 @@ int getSecondsFromTick() {
 }
 
 // define how long the last shot-time will be shown (depends on TICK_INTERVAL)
-const int SHOW_DURATION = 1000; // 500 => 5s; 1000 => 10s
+//const int SHOW_DURATION = 1000; // 500 => 5s; 1000 => 10s
+//const int SHOW_DURATION = 1000; // 500 => 5s; 1000 => 10s
+const int SHOW_DURATION = 1000;
 
-long tcount = 1000000;
+long tcount = 20000;
 bool isTimerRun = false;
 bool isSleeptimerRun = false;
 bool isSleep = true;
@@ -59,11 +76,33 @@ int timerValue = 0;
 
 // tempsensor
 bool isSensorConnected = false;
-float tempInCelsius = 0;
+float TEMP = 0;
 uint16_t temperature = 0;
+uint16_t previousTMP = 0;
 bool requestT = false;
 
+const int numReadings = 10;
+
+int readings[numReadings];      // the readings from the analog input
+int readIndex = 0;              // the index of the current reading
+int total = 0;                  // the running total
+int error = 0;
+
+// menu buttons
+#define LONGPRESS_TIME    2000  // 2s for a long press
+enum { BTN1_NONE = 0, BTN1_SHORTPRESS, BTN1_LONGPRESS };
+enum { BTN2_NONE = 0, BTN2_SHORTPRESS, BTN2_LONGPRESS };
+
+bool inSetupMode = false;
+
+
+
+
 void setup() {
+  // read settings from eeprom
+  readSettings();
+
+  
   pinMode(START_PIN, INPUT);
   digitalWrite(START_PIN, HIGH);
 
@@ -78,7 +117,7 @@ void setup() {
   display.setSegments(bar1);
   delay(500);
 
-  if (sensor.getTemperature(&temperature) && sensor.calc_Celsius(&temperature) > 0) {
+  if (Sensor1.getTemperature(&temperature) && Sensor1.calc_Celsius(&temperature) > 0) {
     isSensorConnected = true;
   };
 
@@ -94,10 +133,50 @@ void setup() {
     Serial.println("set check For Sensor => FALSE");
     display.setSegments(bar1);
     delay(500);
+    pinMode(2, INPUT);
+    digitalWrite(2, HIGH);
+    pinMode(3, INPUT);
+    digitalWrite(3, HIGH);
+
   }
 }
 
 void loop() {
+
+ if( !isSensorConnected){
+      byte btn1Event = handleButton1();
+      byte btn2Event = handleButton2();
+
+       
+   if(btn1Event == BTN1_LONGPRESS){
+      inSetupMode = !inSetupMode;
+      display.clear();
+        }
+             
+    if(inSetupMode){
+      if(setting == 3 || setting == 4){
+        int brightness = settingSet[setting];
+        display.setBrightness(brightness);
+      }
+      else{
+        display.setBrightness(6);
+      }
+      display.showNumberDec(setting, false, 1, 0);
+      display.showNumberDec(settingSet[setting], false, 3, 0);
+      
+      if(btn1Event == BTN1_SHORTPRESS){
+        btn2();  
+      }
+      else if(btn2Event == BTN2_SHORTPRESS){
+        btn3();
+      }
+      else if(btn2Event == BTN2_LONGPRESS){
+        btn1();
+      }
+            
+    }
+  }
+   
 
   // check for signal
   bool isStartPressed = digitalRead(START_PIN) == LOW;
@@ -122,8 +201,8 @@ void loop() {
 
   // timer is running
   if (isTimerRun && isStartPressed) {
-    display.setBrightness(10);
-    display.showNumberDec(getSecondsFromTick(), true /*leading zero*/, 3, 0);
+    display.setBrightness(settingSet[4]);
+    display.showNumberDec(getSecondsFromTick(), settingSet[1] /*leading zero*/, 3, 0);
   }
 
   // no active signal
@@ -140,8 +219,8 @@ void loop() {
     if (!isSleeptimerRun) {
       MsTimer2::start();
       isSleeptimerRun = true;
-      display.setBrightness(10);
-      display.showNumberDec(timerValue, true /*leading zero*/, 3, 0);
+      display.setBrightness(settingSet[3]);
+      display.showNumberDec(timerValue, settingSet[1] /*leading zero*/, 3, 0);
     }
   }
 
@@ -156,7 +235,7 @@ void loop() {
       isSleep = false;
       isHold = false;
       requestT = true;
-      tcount = 1000000;
+      tcount = 20000;
     }
   }
 
@@ -167,27 +246,17 @@ void loop() {
     }
 
 	//TODO: check: requestT will always be false here so the first part of the if expression is always true
-	if (!requestT && tcount >= 800000) {
+	if (!requestT && tcount >= 20000) {
        requestT = true;
       tcount = 0;
-
-      if (sensor.getTemperature(&temperature)) {
-        tempInCelsius = sensor.calc_Celsius(&temperature);
-      }
-
-      // set tempInCelsius to -1 when sensor looses conection
-      Serial.println(tempInCelsius);
-      if (tempInCelsius <= -127.0f) {
-        tempInCelsius = -1.0f;
-      }
+      getTemp();
       display.setBrightness(10);
-
-      if (tempInCelsius < 100) {
-        int TEMPt = tempInCelsius * 10;
+      if (TEMP < 100) {
+        int TEMPt = TEMP * 10;
         display.showNumberDecEx(TEMPt , (0x80 >> 1) , false, 3, 0);
       }
       else {
-        display.showNumberDec(tempInCelsius, false /*leading zero*/, 3, 0);
+        display.showNumberDec(TEMP, false /*leading zero*/, 3, 0);
       }
     }
     tcount++;
